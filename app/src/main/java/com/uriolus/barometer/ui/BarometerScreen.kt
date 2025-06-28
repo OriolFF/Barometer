@@ -9,8 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -75,8 +78,8 @@ fun BarometerScreen(
             drawScale(centerX, centerY, dialRadius * 0.7f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
 
             // Needles
-            drawNeedle(data.pressureMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius * 0.8f, config.mainNeedleColor, 8f)
-            drawNeedle(data.tendencyMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius * 0.75f, config.secondNeedleColor, 4f)
+            drawNeedle(data.pressureMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false, config)
+            drawNeedle(data.tendencyMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true, config)
 
             // Hub
             drawCircle(color = config.textColor, radius = dialRadius * 0.05f, center = Offset(centerX, centerY))
@@ -95,13 +98,6 @@ fun BarometerScreen(
     }
 }
 
-private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweepAngle: Float): Float {
-    val rangeSize = (range.last - range.first).toFloat()
-    if (rangeSize == 0f) return startAngle
-    val valueRatio = (value - range.first) / rangeSize
-    return startAngle + valueRatio * sweepAngle
-}
-
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
     value: Float,
     range: IntRange,
@@ -109,15 +105,88 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
     sweepAngle: Float,
     centerX: Float,
     centerY: Float,
-    length: Float,
-    color: androidx.compose.ui.graphics.Color,
-    strokeWidth: Float
+    radius: Float,
+    color: Color,
+    isTendencyNeedle: Boolean,
+    config: BarometerConfig
 ) {
     val angle = valueToAngle(value, range, startAngle, sweepAngle)
     val angleRad = Math.toRadians(angle.toDouble())
-    val endX = centerX + length * cos(angleRad).toFloat()
-    val endY = centerY + length * sin(angleRad).toFloat()
-    drawLine(color, Offset(centerX, centerY), Offset(endX, endY), strokeWidth = strokeWidth)
+
+    if (isTendencyNeedle) {
+        val needleLength = radius * 0.7f
+        val end = Offset(
+            centerX + needleLength * cos(angleRad).toFloat(),
+            centerY + needleLength * sin(angleRad).toFloat()
+        )
+        drawLine(
+            color = color,
+            start = Offset(centerX, centerY),
+            end = end,
+            strokeWidth = 2f
+        )
+    } else { // Main black needle
+        val needleColor = Color.Black
+        val needleLength = radius * 0.75f
+        val tailLength = radius * 0.3f
+        val arrowLength = radius * 0.1f
+        val arrowWidth = radius * 0.08f
+
+        // Shaft
+        val shaftStart = Offset(
+            x = centerX - tailLength * cos(angleRad).toFloat(),
+            y = centerY - tailLength * sin(angleRad).toFloat()
+        )
+        val shaftEnd = Offset(
+            x = centerX + (needleLength - arrowLength) * cos(angleRad).toFloat(),
+            y = centerY + (needleLength - arrowLength) * sin(angleRad).toFloat()
+        )
+        drawLine(
+            color = needleColor,
+            start = shaftStart,
+            end = shaftEnd,
+            strokeWidth = 4f,
+            cap = StrokeCap.Round
+        )
+
+        // Arrowhead
+        val tip = Offset(
+            x = centerX + needleLength * cos(angleRad).toFloat(),
+            y = centerY + needleLength * sin(angleRad).toFloat()
+        )
+        val perpRad = angleRad + Math.PI / 2
+        val arrowBase1 = Offset(
+            x = shaftEnd.x + (arrowWidth / 2) * cos(perpRad).toFloat(),
+            y = shaftEnd.y + (arrowWidth / 2) * sin(perpRad).toFloat()
+        )
+        val arrowBase2 = Offset(
+            x = shaftEnd.x - (arrowWidth / 2) * cos(perpRad).toFloat(),
+            y = shaftEnd.y - (arrowWidth / 2) * sin(perpRad).toFloat()
+        )
+        val arrowPath = Path().apply {
+            moveTo(tip.x, tip.y)
+            lineTo(arrowBase1.x, arrowBase1.y)
+            lineTo(arrowBase2.x, arrowBase2.y)
+            close()
+        }
+        drawPath(path = arrowPath, color = needleColor)
+
+        // Half-moon tail
+        val tailRadius = radius * 0.05f
+        val tailAngle = Math.toDegrees(angleRad).toFloat() + 180
+        val tailRect = Rect(
+            center = shaftStart,
+            radius = tailRadius
+        )
+        drawArc(
+            color = needleColor,
+            startAngle = tailAngle + 90,
+            sweepAngle = 180f,
+            useCenter = true,
+            topLeft = tailRect.topLeft,
+            size = tailRect.size
+        )
+    }
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
@@ -209,8 +278,15 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
     }
 }
 
+private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweepAngle: Float): Float {
+    val rangeSize = (range.last - range.first).toFloat()
+    if (rangeSize == 0f) return startAngle
+    val valueRatio = (value - range.first) / rangeSize
+    return startAngle + valueRatio * sweepAngle
+}
+
 @Preview(showBackground = true)
 @Composable
 fun BarometerScreenPreview() {
-    BarometerScreen(BarometerData(980f, 1030f))
+    BarometerScreen(BarometerData(1010f, 1030f))
 }
