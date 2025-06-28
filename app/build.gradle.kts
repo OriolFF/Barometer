@@ -59,9 +59,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Koin for Dependency Injection
-    implementation(platform("io.insert-koin:koin-bom:3.5.6"))
-    implementation("io.insert-koin:koin-android")
-    implementation("io.insert-koin:koin-androidx-compose")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

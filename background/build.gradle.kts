@@ -45,8 +45,9 @@ dependencies {
 
 
     // Koin for Dependency Injection
-    implementation(platform("io.insert-koin:koin-bom:3.5.6"))
-    implementation("io.insert-koin:koin-android")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
