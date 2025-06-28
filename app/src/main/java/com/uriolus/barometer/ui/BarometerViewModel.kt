@@ -1,5 +1,6 @@
 package com.uriolus.barometer.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uriolus.barometer.domain.usecases.StartBarometerUseCase
@@ -39,6 +40,7 @@ class BarometerViewModel(
             .onEach { reading ->
                 _state.update { currentState ->
                     // For now, tendency is the previous pressure reading
+                    Log.d("BarometerViewModel", "New data: $reading")
                     val newData = BarometerData(
                         pressureMilliBars = reading.pressure,
                         tendencyMilliBars = currentState.barometerData.pressureMilliBars
@@ -47,6 +49,7 @@ class BarometerViewModel(
                         barometerData = newData,
                         isLoading = false
                     )
+
                 }
             }
             .launchIn(viewModelScope)

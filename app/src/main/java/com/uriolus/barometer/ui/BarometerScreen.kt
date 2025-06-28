@@ -1,11 +1,14 @@
 package com.uriolus.barometer.ui
 
 import android.graphics.Paint
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -32,68 +35,93 @@ fun BarometerScreen(
     modifier: Modifier = Modifier,
     config: BarometerConfig = BarometerConfig()
 ) {
+    val animatedPressure by animateFloatAsState(
+        targetValue = data.pressureMilliBars,
+        animationSpec = tween(durationMillis = 1000),
+        label = "pressureAnimation"
+    )
+    val animatedTendency by animateFloatAsState(
+        targetValue = data.tendencyMilliBars,
+        animationSpec = tween(durationMillis = 1000),
+        label = "tendencyAnimation"
+    )
+
     Box(
-        modifier = modifier,
+        modifier = modifier.aspectRatio(1f),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .aspectRatio(1f)
-        ) {
+        BarometerDial(
+            modifier = Modifier.fillMaxSize(),
+            config = config
+        )
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val rimWidth = size.minDimension * 0.05f
             val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
             val centerX = size.width / 2f
             val centerY = size.height / 2f
             val startAngle = 270 - config.arcDegrees / 2
 
-            // Rim
-            val rimBrush = Brush.sweepGradient(
-                colors = listOf(
-                    Color(0xFFEADCA6), // Highlight
-                    config.mainColor,
-                    Color(0xFF8C7B60), // Shadow
-                    config.mainColor,
-                    Color(0xFFEADCA6)  // Highlight
-                ),
-                center = Offset(centerX, centerY)
-            )
-            drawCircle(
-                brush = rimBrush,
-                radius = dialRadius,
-                center = Offset(centerX, centerY),
-                style = Stroke(width = rimWidth)
-            )
-
-            // Background
-            drawCircle(
-                color = config.backgroundColor,
-                radius = dialRadius - (dialRadius * 0.05f),
-                center = Offset(centerX, centerY)
-            )
-
-            // Millibars Scale (Outer)
-            drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = true)
-            // Millimeters Scale (Inner)
-            drawScale(centerX, centerY, dialRadius * 0.7f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
-
             // Needles
-            drawNeedle(data.pressureMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false, config)
-            drawNeedle(data.tendencyMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true, config)
+            drawNeedle(animatedPressure, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false, config)
+            drawNeedle(animatedTendency, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true, config)
+        }
+    }
+}
 
-            // Hub
-            drawCircle(color = config.textColor, radius = dialRadius * 0.05f, center = Offset(centerX, centerY))
+@Composable
+private fun BarometerDial(
+    modifier: Modifier = Modifier,
+    config: BarometerConfig = BarometerConfig()
+) {
+    Canvas(modifier = modifier) {
+        val rimWidth = size.minDimension * 0.05f
+        val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
+        val centerX = size.width / 2f
+        val centerY = size.height / 2f
+        val startAngle = 270 - config.arcDegrees / 2
 
-            // Unit Text
-            drawIntoCanvas { canvas ->
-                val paint = Paint().apply {
-                    color = config.textColor.toArgb()
-                    textSize = dialRadius * 0.08f
-                    textAlign = Paint.Align.CENTER
-                }
-                canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.9f, paint)
-                canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.7f, paint)
-            }
+        // Rim
+        val rimBrush = Brush.sweepGradient(
+            colors = listOf(
+                Color(0xFFEADCA6), // Highlight
+                config.mainColor,
+                Color(0xFF8C7B60), // Shadow
+                config.mainColor,
+                Color(0xFFEADCA6)  // Highlight
+            ),
+            center = Offset(centerX, centerY)
+        )
+        drawCircle(
+            brush = rimBrush,
+            radius = dialRadius,
+            center = Offset(centerX, centerY),
+            style = Stroke(width = rimWidth)
+        )
+
+        // Background
+        drawCircle(
+            color = config.backgroundColor,
+            radius = dialRadius - (rimWidth / 2f),
+            center = Offset(centerX, centerY)
+        )
+
+        // Scales
+        drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = true)
+        drawScale(centerX, centerY, dialRadius * 0.7f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
+
+        // Hub
+        drawCircle(color = config.textColor, radius = dialRadius * 0.05f, center = Offset(centerX, centerY))
+
+        // Labels
+        val textPaint = Paint().apply {
+            color = config.textColor.toArgb()
+            textSize = dialRadius * 0.08f
+            textAlign = Paint.Align.CENTER
+        }
+        drawIntoCanvas { canvas ->
+            canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.9f, textPaint)
+            canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.7f, textPaint)
         }
     }
 }
