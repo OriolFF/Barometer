@@ -37,13 +37,22 @@ fun BarometerScreen(
     modifier: Modifier = Modifier,
     config: BarometerConfig = BarometerConfig()
 ) {
+    val clampedPressure = data.pressureMilliBars.coerceIn(
+        config.millibarsRange.first.toFloat(),
+        config.millibarsRange.last.toFloat()
+    )
+    val clampedTendency = data.tendencyMilliBars.coerceIn(
+        config.millibarsRange.first.toFloat(),
+        config.millibarsRange.last.toFloat()
+    )
+
     val animatedPressure by animateFloatAsState(
-        targetValue = data.pressureMilliBars,
+        targetValue = clampedPressure,
         animationSpec = tween(durationMillis = 1000),
         label = "pressureAnimation"
     )
     val animatedTendency by animateFloatAsState(
-        targetValue = data.tendencyMilliBars,
+        targetValue = clampedTendency,
         animationSpec = tween(durationMillis = 1000),
         label = "tendencyAnimation"
     )
