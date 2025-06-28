@@ -166,8 +166,8 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
             y = centerY - tailLength * sin(angleRad).toFloat()
         )
         val shaftEnd = Offset(
-            x = centerX + (needleLength - arrowLength) * cos(angleRad).toFloat(),
-            y = centerY + (needleLength - arrowLength) * sin(angleRad).toFloat()
+            x = centerX + needleLength * cos(angleRad).toFloat(),
+            y = centerY + needleLength * sin(angleRad).toFloat()
         )
         drawLine(
             color = needleColor,
@@ -178,18 +178,19 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
         )
 
         // Arrowhead
-        val tip = Offset(
-            x = centerX + needleLength * cos(angleRad).toFloat(),
-            y = centerY + needleLength * sin(angleRad).toFloat()
+        val tip = shaftEnd // The tip is now the end of the shaft
+        val arrowBaseStart = Offset(
+            x = centerX + (needleLength - arrowLength) * cos(angleRad).toFloat(),
+            y = centerY + (needleLength - arrowLength) * sin(angleRad).toFloat()
         )
         val perpRad = angleRad + Math.PI / 2
         val arrowBase1 = Offset(
-            x = shaftEnd.x + (arrowWidth / 2) * cos(perpRad).toFloat(),
-            y = shaftEnd.y + (arrowWidth / 2) * sin(perpRad).toFloat()
+            x = arrowBaseStart.x + (arrowWidth / 2) * cos(perpRad).toFloat(),
+            y = arrowBaseStart.y + (arrowWidth / 2) * sin(perpRad).toFloat()
         )
         val arrowBase2 = Offset(
-            x = shaftEnd.x - (arrowWidth / 2) * cos(perpRad).toFloat(),
-            y = shaftEnd.y - (arrowWidth / 2) * sin(perpRad).toFloat()
+            x = arrowBaseStart.x - (arrowWidth / 2) * cos(perpRad).toFloat(),
+            y = arrowBaseStart.y - (arrowWidth / 2) * sin(perpRad).toFloat()
         )
         val arrowPath = Path().apply {
             moveTo(tip.x, tip.y)
@@ -316,5 +317,5 @@ private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweep
 @Preview(showBackground = true)
 @Composable
 fun BarometerScreenPreview() {
-    BarometerScreen(BarometerData(1010f, 1030f))
+    BarometerScreen(BarometerData(1020f, 1030f))
 }
