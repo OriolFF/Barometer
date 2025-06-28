@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.ui.BarometerData
-import com.uriolus.barometer.ui.BarometerScreen
+import com.uriolus.barometer.ui.analog.BarometerScreen
 import com.uriolus.barometer.ui.BarometerViewModel
 import com.uriolus.barometer.ui.theme.BarometerTheme
 import org.koin.androidx.compose.koinViewModel

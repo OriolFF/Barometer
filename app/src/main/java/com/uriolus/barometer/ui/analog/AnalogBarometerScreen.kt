@@ -1,4 +1,4 @@
-package com.uriolus.barometer.ui
+package com.uriolus.barometer.ui.analog
 
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
+import com.uriolus.barometer.ui.BarometerData
 import com.uriolus.barometer.util.PressureConverter
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -35,7 +36,7 @@ import kotlin.math.sin
 fun BarometerScreen(
     data: BarometerData,
     modifier: Modifier = Modifier,
-    config: BarometerConfig = BarometerConfig()
+    config: AnalogBarometerConfig = AnalogBarometerConfig()
 ) {
     val clampedPressure = data.pressureMilliBars.coerceIn(
         config.millibarsRange.first.toFloat(),
@@ -83,7 +84,7 @@ fun BarometerScreen(
 @Composable
 private fun BarometerDial(
     modifier: Modifier = Modifier,
-    config: BarometerConfig = BarometerConfig()
+    config: AnalogBarometerConfig = AnalogBarometerConfig()
 ) {
     Canvas(modifier = modifier) {
         val rimWidth = size.minDimension * 0.05f
@@ -148,7 +149,7 @@ private fun DrawScope.drawNeedle(
     radius: Float,
     color: Color,
     isTendencyNeedle: Boolean,
-    config: BarometerConfig
+    config: AnalogBarometerConfig
 ) {
     val angle = valueToAngle(value, range, startAngle, sweepAngle)
     val angleRad = Math.toRadians(angle.toDouble())
@@ -231,7 +232,7 @@ private fun DrawScope.drawNeedle(
 }
 
 private fun DrawScope.drawScale(
-    centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: BarometerConfig, isMillibars: Boolean
+    centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: AnalogBarometerConfig, isMillibars: Boolean
 ) {
     val textPaint = Paint().apply {
         color = config.textColor.toArgb()

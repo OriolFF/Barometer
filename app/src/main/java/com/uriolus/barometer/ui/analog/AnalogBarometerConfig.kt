@@ -1,8 +1,8 @@
-package com.uriolus.barometer.ui
+package com.uriolus.barometer.ui.analog
 
 import androidx.compose.ui.graphics.Color
 
-data class BarometerConfig(
+data class AnalogBarometerConfig(
     val millibarsRange: IntRange = 940..1060,
     val millibarsStep: Int = 10,
     val arcDegrees: Float = 300f,
