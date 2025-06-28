@@ -14,7 +14,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
+import com.uriolus.barometer.util.PressureConverter
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
@@ -54,9 +56,9 @@ fun BarometerScreen(
             )
 
             // Millibars Scale (Outer)
-            drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config)
+            drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = true)
             // Millimeters Scale (Inner)
-            drawScale(centerX, centerY, dialRadius * 0.7f, config.millimetersRange, config.millimetersStep, startAngle, config.arcDegrees, false, config)
+            drawScale(centerX, centerY, dialRadius * 0.7f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
 
             // Needles
             drawNeedle(data.pressureMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius * 0.8f, config.mainNeedleColor, 8f)
@@ -72,8 +74,8 @@ fun BarometerScreen(
                     textSize = dialRadius * 0.08f
                     textAlign = Paint.Align.CENTER
                 }
-                canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.5f, paint)
-                canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.6f, paint)
+                canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.9f, paint)
+                canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.7f, paint)
             }
         }
     }
@@ -105,7 +107,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
-    centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: BarometerConfig
+    centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: BarometerConfig, isMillibars: Boolean
 ) {
     val textPaint = Paint().apply {
         color = config.textColor.toArgb()
@@ -114,32 +116,77 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
     }
 
     // Major ticks and labels
-    for (value in range.first..range.last step step) {
-        val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
-        val angleRad = Math.toRadians(angle.toDouble())
-        val startRadius = radius
-        val endRadius = radius - (if (drawSubMarks) 20f else 15f)
-        val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
-        val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
-        drawLine(config.textColor, start, end, strokeWidth = 3f)
+    if (isMillibars) {
+        for (value in range.first..range.last step step) {
+            val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
+            val angleRad = Math.toRadians(angle.toDouble())
+            val startRadius = radius
+            val endRadius = radius - (if (drawSubMarks) 20f else 15f)
+            val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+            val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+            drawLine(config.textColor, start, end, strokeWidth = 3f)
 
-        val textRadius = radius - 40f
-        val textX = centerX + textRadius * cos(angleRad).toFloat()
-        val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
-        drawIntoCanvas { it.nativeCanvas.drawText(value.toString(), textX, textY, textPaint) }
+            val textRadius = radius - 40f
+            val textX = centerX + textRadius * cos(angleRad).toFloat()
+            val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
+            val label = value.toString()
+            drawIntoCanvas { it.nativeCanvas.drawText(label, textX, textY, textPaint) }
+        }
+    } else {
+        val minCmHg = PressureConverter.mbarToCmHg(range.first).roundToInt()
+        val maxCmHg = PressureConverter.mbarToCmHg(range.last).roundToInt()
+        for (cmHgValue in minCmHg..maxCmHg) {
+            val correspondingMbar = PressureConverter.cmHgToMbar(cmHgValue)
+            if (correspondingMbar < range.first || correspondingMbar > range.last) continue
+
+            val angle = valueToAngle(correspondingMbar, range, startAngle, sweepAngle)
+            val angleRad = Math.toRadians(angle.toDouble())
+            val startRadius = radius
+            val endRadius = radius - 20f
+            val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+            val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+            drawLine(config.textColor, start, end, strokeWidth = 3f)
+
+            val textRadius = radius - 40f
+            val textX = centerX + textRadius * cos(angleRad).toFloat()
+            val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
+            val label = cmHgValue.toString()
+            drawIntoCanvas { it.nativeCanvas.drawText(label, textX, textY, textPaint) }
+        }
     }
 
-    // Sub-marks (only for millibars)
+    // Sub-marks
     if (drawSubMarks) {
-        for (value in range.first..range.last) {
-            if (value % step != 0) {
-                val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
-                val angleRad = Math.toRadians(angle.toDouble())
-                val startRadius = radius
-                val endRadius = radius - 10f
-                val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
-                val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
-                drawLine(config.textColor, start, end, strokeWidth = 1f)
+        if (isMillibars) { // Millibars logic
+            for (value in range.first..range.last) {
+                if (value % step != 0) {
+                    val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
+                    val angleRad = Math.toRadians(angle.toDouble())
+                    val startRadius = radius
+                    val endRadius = radius - 10f
+                    val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+                    val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+                    drawLine(config.textColor, start, end, strokeWidth = 1f)
+                }
+            }
+        } else { // Millimeters logic
+            val minCmHg = PressureConverter.mbarToCmHg(range.first).roundToInt()
+            val maxCmHg = PressureConverter.mbarToCmHg(range.last).roundToInt()
+            val subMarkCount = 10
+            for (majorValue in minCmHg until maxCmHg) {
+                for (i in 1 until subMarkCount) {
+                    val valueCmHg = majorValue + i.toFloat() / subMarkCount
+                    val correspondingMbar = PressureConverter.cmHgToMbar(valueCmHg)
+                    if (correspondingMbar < range.first || correspondingMbar > range.last) continue
+
+                    val angle = valueToAngle(correspondingMbar, range, startAngle, sweepAngle)
+                    val angleRad = Math.toRadians(angle.toDouble())
+                    val startRadius = radius
+                    val endRadius = radius - 10f
+                    val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+                    val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+                    drawLine(config.textColor, start, end, strokeWidth = 1f)
+                }
             }
         }
     }
