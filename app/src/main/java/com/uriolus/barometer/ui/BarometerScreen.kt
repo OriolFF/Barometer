@@ -1,100 +1,151 @@
 package com.uriolus.barometer.ui
 
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun BarometerScreen(data: BarometerData) {
-    Canvas(modifier = Modifier
-        .fillMaxSize()
-        .aspectRatio(1f)) {
-        val dialRadius = size.minDimension / 2
-        val centerX = size.width / 2
-        val centerY = size.height / 2
+fun BarometerScreen(
+    data: BarometerData,
+    modifier: Modifier = Modifier,
+    config: BarometerConfig = BarometerConfig()
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+        ) {
+            val rimWidth = size.minDimension * 0.05f
+            val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
+            val centerX = size.width / 2f
+            val centerY = size.height / 2f
+            val startAngle = 270 - config.arcDegrees / 2
 
-        // Draw dial
-        drawCircle(
-            color = Color(0xFFD2B48C),
-            radius = dialRadius,
-            center = Offset(centerX, centerY),
-            style = Stroke(width = 20f)
-        )
+            // Rim
+            drawCircle(
+                color = config.mainColor,
+                radius = dialRadius,
+                center = Offset(centerX, centerY),
+                style = Stroke(width = rimWidth)
+            )
 
-        // Draw background
-        drawCircle(
-            color = Color(0xFFF5F5DC),
-            radius = dialRadius - 10,
-            center = Offset(centerX, centerY)
-        )
+            // Background
+            drawCircle(
+                color = config.backgroundColor,
+                radius = dialRadius - (dialRadius * 0.05f),
+                center = Offset(centerX, centerY)
+            )
 
-        // Draw scale
-        for (i in 960..1050 step 10) {
-            val angle = (i - 960) * (270f / 90f) - 135
-            val angleRad = Math.toRadians(angle.toDouble())
-            val startRadius = dialRadius - 20
-            val endRadius = dialRadius - 40
-            val startX = centerX + startRadius * cos(angleRad).toFloat()
-            val startY = centerY + startRadius * sin(angleRad).toFloat()
-            val endX = centerX + endRadius * cos(angleRad).toFloat()
-            val endY = centerY + endRadius * sin(angleRad).toFloat()
-            drawLine(Color.Black, Offset(startX, startY), Offset(endX, endY), strokeWidth = 2f)
-        }
+            // Millibars Scale (Outer)
+            drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config)
+            // Millimeters Scale (Inner)
+            drawScale(centerX, centerY, dialRadius * 0.7f, config.millimetersRange, config.millimetersStep, startAngle, config.arcDegrees, false, config)
 
-        // Draw zones
-        drawIntoCanvas { canvas ->
-            val paint = android.graphics.Paint().apply {
-                color = android.graphics.Color.BLACK
-                textSize = 40f
-                textAlign = android.graphics.Paint.Align.CENTER
+            // Needles
+            drawNeedle(data.pressureMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius * 0.8f, config.mainNeedleColor, 8f)
+            drawNeedle(data.tendencyMilliBars, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius * 0.75f, config.secondNeedleColor, 4f)
+
+            // Hub
+            drawCircle(color = config.textColor, radius = dialRadius * 0.05f, center = Offset(centerX, centerY))
+
+            // Unit Text
+            drawIntoCanvas { canvas ->
+                val paint = Paint().apply {
+                    color = config.textColor.toArgb()
+                    textSize = dialRadius * 0.08f
+                    textAlign = Paint.Align.CENTER
+                }
+                canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.5f, paint)
+                canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.6f, paint)
             }
-            canvas.nativeCanvas.drawText("RAIN", centerX - dialRadius / 2, centerY + dialRadius / 4, paint)
-            canvas.nativeCanvas.drawText("CHANGE", centerX, centerY - dialRadius / 2, paint)
-            canvas.nativeCanvas.drawText("FAIR", centerX + dialRadius / 2, centerY + dialRadius / 4, paint)
-        }
-
-        // Draw pointers
-        val pressureAngle = (data.pressure - 960) * (270f / 90f) - 135
-        val pressureAngleRad = Math.toRadians(pressureAngle.toDouble())
-        val pressurePointerLength = dialRadius - 60
-        val pressurePointerX = centerX + pressurePointerLength * cos(pressureAngleRad).toFloat()
-        val pressurePointerY = centerY + pressurePointerLength * sin(pressureAngleRad).toFloat()
-        drawLine(Color.Black, Offset(centerX, centerY), Offset(pressurePointerX, pressurePointerY), strokeWidth = 8f)
-
-        val tendencyAngle = (data.tendency - 960) * (270f / 90f) - 135
-        val tendencyAngleRad = Math.toRadians(tendencyAngle.toDouble())
-        val tendencyPointerLength = dialRadius - 50
-        val tendencyPointerX = centerX + tendencyPointerLength * cos(tendencyAngleRad).toFloat()
-        val tendencyPointerY = centerY + tendencyPointerLength * sin(tendencyAngleRad).toFloat()
-        drawLine(Color(0xFFD4AF37), Offset(centerX, centerY), Offset(tendencyPointerX, tendencyPointerY), strokeWidth = 4f)
-
-        // Draw central hub
-        drawCircle(Color.Black, radius = 10f, center = Offset(centerX, centerY))
-
-        // Draw text
-        drawIntoCanvas { canvas ->
-            val paint = android.graphics.Paint().apply {
-                color = android.graphics.Color.BLACK
-                textSize = 20f
-                textAlign = android.graphics.Paint.Align.CENTER
-            }
-            canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius - 40, paint)
-            canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius - 20, paint)
         }
     }
 }
 
-@Preview
+private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweepAngle: Float): Float {
+    val rangeSize = (range.last - range.first).toFloat()
+    if (rangeSize == 0f) return startAngle
+    val valueRatio = (value - range.first) / rangeSize
+    return startAngle + valueRatio * sweepAngle
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
+    value: Float,
+    range: IntRange,
+    startAngle: Float,
+    sweepAngle: Float,
+    centerX: Float,
+    centerY: Float,
+    length: Float,
+    color: androidx.compose.ui.graphics.Color,
+    strokeWidth: Float
+) {
+    val angle = valueToAngle(value, range, startAngle, sweepAngle)
+    val angleRad = Math.toRadians(angle.toDouble())
+    val endX = centerX + length * cos(angleRad).toFloat()
+    val endY = centerY + length * sin(angleRad).toFloat()
+    drawLine(color, Offset(centerX, centerY), Offset(endX, endY), strokeWidth = strokeWidth)
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
+    centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: BarometerConfig
+) {
+    val textPaint = Paint().apply {
+        color = config.textColor.toArgb()
+        textSize = radius * 0.1f
+        textAlign = Paint.Align.CENTER
+    }
+
+    // Major ticks and labels
+    for (value in range.first..range.last step step) {
+        val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
+        val angleRad = Math.toRadians(angle.toDouble())
+        val startRadius = radius
+        val endRadius = radius - (if (drawSubMarks) 20f else 15f)
+        val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+        val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+        drawLine(config.textColor, start, end, strokeWidth = 3f)
+
+        val textRadius = radius - 40f
+        val textX = centerX + textRadius * cos(angleRad).toFloat()
+        val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
+        drawIntoCanvas { it.nativeCanvas.drawText(value.toString(), textX, textY, textPaint) }
+    }
+
+    // Sub-marks (only for millibars)
+    if (drawSubMarks) {
+        for (value in range.first..range.last) {
+            if (value % step != 0) {
+                val angle = valueToAngle(value.toFloat(), range, startAngle, sweepAngle)
+                val angleRad = Math.toRadians(angle.toDouble())
+                val startRadius = radius
+                val endRadius = radius - 10f
+                val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+                val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+                drawLine(config.textColor, start, end, strokeWidth = 1f)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 fun BarometerScreenPreview() {
     BarometerScreen(BarometerData(980f, 1030f))

@@ -5,11 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.ui.BarometerData
 import com.uriolus.barometer.ui.BarometerScreen
 import com.uriolus.barometer.ui.theme.BarometerTheme
@@ -25,7 +27,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BarometerScreen(BarometerData(980f, 1030f))
+                    BarometerScreen(
+                        data = BarometerData(980f, 1030f),
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
             }
         }
@@ -36,6 +41,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     BarometerTheme {
-        BarometerScreen(BarometerData(980f, 1030f))
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BarometerScreen(
+                data = BarometerData(980f, 1030f),
+                modifier = Modifier.padding(36.dp)
+            )
+        }
     }
 }
