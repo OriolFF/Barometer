@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -41,8 +43,18 @@ fun BarometerScreen(
             val startAngle = 270 - config.arcDegrees / 2
 
             // Rim
+            val rimBrush = Brush.sweepGradient(
+                colors = listOf(
+                    Color(0xFFEADCA6), // Highlight
+                    config.mainColor,
+                    Color(0xFF8C7B60), // Shadow
+                    config.mainColor,
+                    Color(0xFFEADCA6)  // Highlight
+                ),
+                center = Offset(centerX, centerY)
+            )
             drawCircle(
-                color = config.mainColor,
+                brush = rimBrush,
                 radius = dialRadius,
                 center = Offset(centerX, centerY),
                 style = Stroke(width = rimWidth)
