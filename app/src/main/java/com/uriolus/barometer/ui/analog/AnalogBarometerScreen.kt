@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun BarometerScreen(
+fun AnalogBarometerScreen(
     data: BarometerData,
     modifier: Modifier = Modifier,
     config: AnalogBarometerConfig = AnalogBarometerConfig()
@@ -330,5 +330,5 @@ private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweep
 @Preview(showBackground = true)
 @Composable
 fun BarometerScreenPreview() {
-    BarometerScreen(BarometerData(1025f, 1030f))
+    AnalogBarometerScreen(BarometerData(1025f, 1030f))
 }
