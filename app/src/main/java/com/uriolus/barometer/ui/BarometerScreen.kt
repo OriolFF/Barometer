@@ -17,7 +17,9 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import com.uriolus.barometer.util.PressureConverter
+import kotlin.math.ceil
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -182,23 +184,26 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
                 }
             }
         } else { // Millimeters logic
-            val minCmHg = PressureConverter.mbarToCmHg(range.first).roundToInt()
-            val maxCmHg = PressureConverter.mbarToCmHg(range.last).roundToInt()
-            val subMarkCount = 10
-            for (majorValue in minCmHg until maxCmHg) {
-                for (i in 1 until subMarkCount) {
-                    val valueCmHg = majorValue + i.toFloat() / subMarkCount
-                    val correspondingMbar = PressureConverter.cmHgToMbar(valueCmHg)
-                    if (correspondingMbar < range.first || correspondingMbar > range.last) continue
+            val startCmHg = PressureConverter.mbarToCmHg(range.first)
+            val endCmHg = PressureConverter.mbarToCmHg(range.last)
 
-                    val angle = valueToAngle(correspondingMbar, range, startAngle, sweepAngle)
-                    val angleRad = Math.toRadians(angle.toDouble())
-                    val startRadius = radius
-                    val endRadius = radius - 10f
-                    val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
-                    val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
-                    drawLine(config.textColor, start, end, strokeWidth = 1f)
-                }
+            val firstSubmarkTenths = ceil(startCmHg * 10).toInt()
+            val lastSubmarkTenths = floor(endCmHg * 10).toInt()
+
+            for (tenth in firstSubmarkTenths..lastSubmarkTenths) {
+                if (tenth % 10 == 0) continue // Skip major ticks
+
+                val valueCmHg = tenth / 10f
+                val correspondingMbar = PressureConverter.cmHgToMbar(valueCmHg)
+                if (correspondingMbar < range.first || correspondingMbar > range.last) continue
+
+                val angle = valueToAngle(correspondingMbar, range, startAngle, sweepAngle)
+                val angleRad = Math.toRadians(angle.toDouble())
+                val startRadius = radius
+                val endRadius = radius - 10f
+                val start = Offset(centerX + startRadius * cos(angleRad).toFloat(), centerY + startRadius * sin(angleRad).toFloat())
+                val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
+                drawLine(config.textColor, start, end, strokeWidth = 1f)
             }
         }
     }
