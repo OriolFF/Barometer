@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.ui.BarometerData
 import com.uriolus.barometer.ui.BarometerScreen
+import com.uriolus.barometer.ui.BarometerViewModel
 import com.uriolus.barometer.ui.theme.BarometerTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,13 +26,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BarometerTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val viewModel: BarometerViewModel = koinViewModel()
+                    val state by viewModel.state.collectAsState()
+
                     BarometerScreen(
-                        data = BarometerData(980f, 1030f),
+                        data = state.barometerData,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -41,14 +47,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     BarometerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            BarometerScreen(
-                data = BarometerData(980f, 1030f),
-                modifier = Modifier.padding(36.dp)
-            )
-        }
+        BarometerScreen(BarometerData(1010f, 1030f))
     }
 }
