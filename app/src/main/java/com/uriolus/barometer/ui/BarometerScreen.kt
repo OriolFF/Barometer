@@ -126,7 +126,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
             val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
             drawLine(config.textColor, start, end, strokeWidth = 3f)
 
-            val textRadius = radius - 40f
+            val textRadius = radius - 60f
             val textX = centerX + textRadius * cos(angleRad).toFloat()
             val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
             val label = value.toString()
@@ -147,7 +147,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
             val end = Offset(centerX + endRadius * cos(angleRad).toFloat(), centerY + endRadius * sin(angleRad).toFloat())
             drawLine(config.textColor, start, end, strokeWidth = 3f)
 
-            val textRadius = radius - 40f
+            val textRadius = radius - 60f
             val textX = centerX + textRadius * cos(angleRad).toFloat()
             val textY = centerY + textRadius * sin(angleRad).toFloat() + textPaint.textSize / 3
             val label = cmHgValue.toString()
