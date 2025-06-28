@@ -1,6 +1,7 @@
 package com.uriolus.barometer.ui
 
 import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -115,18 +117,19 @@ private fun BarometerDial(
 
         // Labels
         val textPaint = Paint().apply {
-            color = config.textColor.toArgb()
+            color = Color.Black.toArgb()
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textSize = dialRadius * 0.08f
             textAlign = Paint.Align.CENTER
         }
         drawIntoCanvas { canvas ->
-            canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.9f, textPaint)
-            canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.7f, textPaint)
+            canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.85f, textPaint)
+            canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.65f, textPaint)
         }
     }
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
+private fun DrawScope.drawNeedle(
     value: Float,
     range: IntRange,
     startAngle: Float,
@@ -218,7 +221,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawNeedle(
     }
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawScale(
+private fun DrawScope.drawScale(
     centerX: Float, centerY: Float, radius: Float, range: IntRange, step: Int, startAngle: Float, sweepAngle: Float, drawSubMarks: Boolean, config: BarometerConfig, isMillibars: Boolean
 ) {
     val textPaint = Paint().apply {
@@ -317,5 +320,5 @@ private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweep
 @Preview(showBackground = true)
 @Composable
 fun BarometerScreenPreview() {
-    BarometerScreen(BarometerData(1020f, 1030f))
+    BarometerScreen(BarometerData(1025f, 1030f))
 }
