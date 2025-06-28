@@ -1,6 +1,7 @@
 package com.uriolus.barometer.background.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.uriolus.barometer.background.database.dao.PressureDao
@@ -32,6 +33,7 @@ class SavePressureWorker(
             Result.success()
         } catch (e: Exception) {
             // If something goes wrong, mark the work as failed.
+            Log.e("SavePressureWorker", "Error saving pressure reading", e)
             Result.failure()
         }
     }
