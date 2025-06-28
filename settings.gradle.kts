@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Barometer"
 include(":app")
- 
+include(":background")
