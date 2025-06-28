@@ -1,0 +1,21 @@
+this project is to show a barometer and keep an historic of lectures
+Also will show the tendency
+
+# Architecture
+- clean code
+- MVI
+- Dependency Injection
+- Unit test
+
+# Tools
+- Kotlin
+- AndroidX
+- koin
+- Jetpack Compose
+- Room
+- Coroutines
+- kotlinx.serialization
+
+# style
+- Material3 design
+- don't add comments unless very necessary
