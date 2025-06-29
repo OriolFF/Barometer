@@ -8,13 +8,16 @@ import com.uriolus.barometer.background.database.dao.PressureDao
 import com.uriolus.barometer.background.database.entity.PressureReading
 import com.uriolus.barometer.background.datasource.BarometerDataSource
 import kotlinx.coroutines.flow.first
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class SavePressureWorker(
     appContext: Context,
-    workerParams: WorkerParameters,
-    private val barometerDataSource: BarometerDataSource,
-    private val pressureDao: PressureDao
-) : CoroutineWorker(appContext, workerParams) {
+    workerParams: WorkerParameters
+) : CoroutineWorker(appContext, workerParams), KoinComponent {
+
+    private val barometerDataSource: BarometerDataSource by inject()
+    private val pressureDao: PressureDao by inject()
 
     override suspend fun doWork(): Result {
         return try {

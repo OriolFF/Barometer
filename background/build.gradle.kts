@@ -47,6 +47,8 @@ dependencies {
     // Koin for Dependency Injection
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
+    // Koin for WorkManager
+    implementation(libs.koin.androidx.workmanager)
     implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
