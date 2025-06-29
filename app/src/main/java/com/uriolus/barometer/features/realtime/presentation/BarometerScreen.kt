@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui
+package com.uriolus.barometer.features.realtime.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.uriolus.barometer.features.realtime.ui.digital.DigitalBarometerScreen
-import com.uriolus.barometer.features.realtime.ui.analog.AnalogBarometerScreen
+import com.uriolus.barometer.features.realtime.presentation.digital.DigitalBarometerScreen
+import com.uriolus.barometer.features.realtime.presentation.analog.AnalogBarometerScreen
 
 @Composable
 fun BarometerScreen(data: BarometerData, modifier: Modifier = Modifier) {

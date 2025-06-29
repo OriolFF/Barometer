@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui
+package com.uriolus.barometer.features.realtime.presentation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

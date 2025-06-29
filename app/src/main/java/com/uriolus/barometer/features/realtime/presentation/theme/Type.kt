@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui.theme
+package com.uriolus.barometer.features.realtime.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

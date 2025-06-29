@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui.analog
+package com.uriolus.barometer.features.realtime.presentation.analog
 
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
-import com.uriolus.barometer.features.realtime.ui.BarometerData
+import com.uriolus.barometer.features.realtime.presentation.BarometerData
 import com.uriolus.barometer.features.realtime.util.PressureConverter
 import kotlin.math.ceil
 import kotlin.math.cos

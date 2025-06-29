@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui.digital
+package com.uriolus.barometer.features.realtime.presentation.digital
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.uriolus.barometer.features.realtime.ui.BarometerData
-import com.uriolus.barometer.features.realtime.ui.theme.BarometerTheme
+import com.uriolus.barometer.features.realtime.presentation.BarometerData
+import com.uriolus.barometer.features.realtime.presentation.theme.BarometerTheme
 import java.util.Locale
 
 @Composable

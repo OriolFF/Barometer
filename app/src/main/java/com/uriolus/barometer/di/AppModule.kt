@@ -7,7 +7,7 @@ import com.uriolus.barometer.features.realtime.domain.repository.BarometerReposi
 import com.uriolus.barometer.features.realtime.domain.usecases.StartBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.StopBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.SubscribeBarometerUseCase
-import com.uriolus.barometer.features.realtime.ui.BarometerViewModel
+import com.uriolus.barometer.features.realtime.presentation.BarometerViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module

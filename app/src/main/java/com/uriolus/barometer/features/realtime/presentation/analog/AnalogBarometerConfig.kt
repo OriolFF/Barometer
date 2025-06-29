@@ -1,4 +1,4 @@
-package com.uriolus.barometer.features.realtime.ui.analog
+package com.uriolus.barometer.features.realtime.presentation.analog
 
 import androidx.compose.ui.graphics.Color
 
