@@ -12,10 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.uriolus.barometer.ui.BarometerData
-import com.uriolus.barometer.ui.BarometerScreen
-import com.uriolus.barometer.ui.BarometerViewModel
-import com.uriolus.barometer.ui.theme.BarometerTheme
+import com.uriolus.barometer.features.realtime.ui.BarometerData
+import com.uriolus.barometer.features.realtime.ui.BarometerScreen
+import com.uriolus.barometer.features.realtime.ui.BarometerViewModel
+import com.uriolus.barometer.features.realtime.ui.theme.BarometerTheme
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
