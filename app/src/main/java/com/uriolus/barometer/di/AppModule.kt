@@ -1,5 +1,6 @@
 package com.uriolus.barometer.di
 
+import com.uriolus.barometer.features.historic.presentation.HistoricViewModel
 import com.uriolus.barometer.features.realtime.data.datasource.BarometerDataSource
 import com.uriolus.barometer.features.realtime.data.datasource.RealBarometerDataSource
 import com.uriolus.barometer.features.realtime.data.repository.BarometerRepositoryImpl
@@ -24,4 +25,5 @@ val appModule = module {
 
     // Presentation
     viewModel { BarometerViewModel(get(), get(), get()) }
+
 }
