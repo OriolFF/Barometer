@@ -52,10 +52,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
 
-    // Vico Charting Library
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
-    implementation(libs.vico.core)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
