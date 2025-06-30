@@ -43,9 +43,7 @@ import com.uriolus.barometer.features.realtime.presentation.theme.BarometerTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.max
 import kotlin.math.min
-import kotlin.text.*
 
 @Composable
 fun HistoricScreen(
@@ -136,11 +134,25 @@ fun PressureChart(readings: List<PressureSample>, modifier: Modifier = Modifier)
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     
+    // Define padding for the chart area
+    val leftPadding = 50.dp
+    val bottomPadding = 30.dp
+    
     Box(modifier = modifier
         .pointerInput(Unit) {
             detectTransformGestures { _, pan, zoom, _ ->
                 scale = (scale * zoom).coerceIn(0.5f, 3f)
-                offset += pan
+                
+                // Limit the panning to prevent going out of bounds
+                // Calculate max allowed offsets based on scale and chart size
+                val maxHorizontalOffset = size.width * (scale - 1f) / 2
+                val maxVerticalOffset = size.height * (scale - 1f) / 2
+                
+                // Update offset with bounds
+                offset = Offset(
+                    x = (offset.x + pan.x).coerceIn(-maxHorizontalOffset, maxHorizontalOffset),
+                    y = (offset.y + pan.y).coerceIn(-maxVerticalOffset, maxVerticalOffset)
+                )
             }
         }
     ) {
@@ -148,16 +160,24 @@ fun PressureChart(readings: List<PressureSample>, modifier: Modifier = Modifier)
             val chartWidth = size.width
             val chartHeight = size.height
             
+            // Convert dp to pixels
+            val leftPaddingPx = leftPadding.toPx()
+            val bottomPaddingPx = bottomPadding.toPx()
+            
+            // Adjusted chart dimensions
+            val adjustedChartWidth = chartWidth - leftPaddingPx
+            val adjustedChartHeight = chartHeight - bottomPaddingPx
+            
             // Draw Y-axis labels (pressure values)
             val yLabelCount = 5
             for (i in 0..yLabelCount) {
                 val pressure = minPressure + (pressureRange * i / yLabelCount)
-                val y = chartHeight - (chartHeight * (pressure - minPressure) / pressureRange)
+                val y = adjustedChartHeight - (adjustedChartHeight * (pressure - minPressure) / pressureRange)
                 
-                // Draw horizontal grid line
+                // Draw horizontal grid line (starting after the labels)
                 drawLine(
                     color = gridLineColor,
-                    start = Offset(0f, y),
+                    start = Offset(leftPaddingPx, y),
                     end = Offset(chartWidth, y),
                     strokeWidth = 1f
                 )
@@ -173,12 +193,12 @@ fun PressureChart(readings: List<PressureSample>, modifier: Modifier = Modifier)
             // Draw the pressure line
             if (readings.size > 1) {
                 val path = Path()
-                val pointWidth = chartWidth / (readings.size - 1)
+                val pointWidth = adjustedChartWidth / (readings.size - 1)
                 
                 readings.forEachIndexed { index, sample ->
-                    val x = index * pointWidth * scale + offset.x
+                    val x = leftPaddingPx + (index * pointWidth * scale) + offset.x
                     val normalizedY = (sample.pressureValue - minPressure) / pressureRange
-                    val y = chartHeight - (normalizedY * chartHeight)
+                    val y = adjustedChartHeight - (normalizedY * adjustedChartHeight)
                     
                     if (index == 0) {
                         path.moveTo(x, y)
@@ -206,7 +226,7 @@ fun PressureChart(readings: List<PressureSample>, modifier: Modifier = Modifier)
                 for (i in 0 until labelCount) {
                     val index = (readings.size - 1) * i / (labelCount - 1)
                     val sample = readings[index]
-                    val x = index * pointWidth * scale + offset.x
+                    val x = leftPaddingPx + (index * pointWidth * scale) + offset.x
                     
                     drawText(
                         textMeasurer = textMeasurer,
