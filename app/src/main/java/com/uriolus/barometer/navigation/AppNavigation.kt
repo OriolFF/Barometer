@@ -10,7 +10,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,10 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.uriolus.barometer.features.historic.presentation.HistoricScreen
-import com.uriolus.barometer.features.historic.presentation.HistoricViewModel
 import com.uriolus.barometer.features.realtime.presentation.BarometerScreen
-import com.uriolus.barometer.features.realtime.presentation.BarometerViewModel
-import org.koin.androidx.compose.koinViewModel
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Realtime : Screen("realtime", "Realtime", Icons.Default.Home)
@@ -69,14 +65,10 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Realtime.route) {
-                val viewModel: BarometerViewModel = koinViewModel()
-                val state by viewModel.state.collectAsState()
-                BarometerScreen(data = state.barometerData)
+                BarometerScreen()
             }
             composable(Screen.Historic.route) {
-                val viewModel: HistoricViewModel = koinViewModel()
-                val state by viewModel.state.collectAsState()
-                HistoricScreen(state = state)
+                HistoricScreen()
             }
         }
     }

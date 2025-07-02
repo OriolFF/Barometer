@@ -51,10 +51,9 @@ class BarometerViewModel(
                         barometerData = newData,
                         isLoading = false
                     )
-
                 }
             }
-            .flowOn(Dispatchers.Default)
+            .flowOn(Dispatchers.IO)
             .launchIn(viewModelScope)
     }
 

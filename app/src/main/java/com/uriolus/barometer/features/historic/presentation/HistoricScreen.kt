@@ -17,15 +17,18 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.features.historic.domain.model.PressureSample
+import com.uriolus.barometer.features.realtime.presentation.theme.BarometerTheme
 import com.uriolus.barometer.features.shared.presentation.PressureChart
 import com.uriolus.barometer.features.shared.presentation.PressureReading
-import com.uriolus.barometer.features.realtime.presentation.theme.BarometerTheme
+import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,9 +36,10 @@ import kotlin.math.min
 
 @Composable
 fun HistoricScreen(
-    state: HistoricState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: HistoricViewModel = koinViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
     Box(modifier = modifier.fillMaxSize()) {
         if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -49,26 +53,25 @@ fun HistoricScreen(
                         .height(240.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    // Convert PressureSample to PressureReading for the chart
                     val chartReadings = remember(state.readings) {
-                        state.readings.map { sample ->
-                            PressureReading(
-                                timestamp = sample.timestamp,
-                                pressure = sample.pressureValue
-                            )
+                        val last100Readings = state.readings.takeLast(100)
+                        last100Readings.map { sample ->
+                            PressureReading(sample.timestamp, sample.pressureValue)
                         }
                     }
-                    
-                    PressureChart(
-                        readings = chartReadings,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                    if (chartReadings.isNotEmpty()) {
+                        PressureChart(
+                            readings = chartReadings,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
-                
+
                 // List section
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     items(state.readings) { reading ->
                         HistoricReadingItem(reading = reading)
                         Divider()
@@ -110,16 +113,8 @@ private fun formatTimestamp(timestamp: Long): String {
 @Composable
 fun HistoricScreenPreview() {
     BarometerTheme {
-        val sampleReadings = remember {
-            listOf(
-                PressureSample(timestamp = System.currentTimeMillis() - 30000, pressureValue = 1012.8f),
-                PressureSample(timestamp = System.currentTimeMillis() - 20000, pressureValue = 1013.0f),
-                PressureSample(timestamp = System.currentTimeMillis() - 10000, pressureValue = 1012.5f),
-                PressureSample(timestamp = System.currentTimeMillis(), pressureValue = 1014.1f)
-            )
-        }
-        val state = HistoricState(readings = sampleReadings.reversed(), isLoading = false)
-        HistoricScreen(state = state)
+        val viewModel: HistoricViewModel = koinViewModel()
+        HistoricScreen(viewModel = viewModel)
     }
 }
 
