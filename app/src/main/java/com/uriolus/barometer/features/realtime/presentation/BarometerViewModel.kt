@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.uriolus.barometer.features.realtime.domain.usecases.StartBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.StopBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.SubscribeBarometerUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -36,7 +38,7 @@ class BarometerViewModel(
     }
 
     private fun subscribeToBarometer() {
-        subscribeBarometerUseCase()
+        subscribeBarometerUseCase.exec()
             .onEach { reading ->
                 _state.update { currentState ->
                     // For now, tendency is the previous pressure reading
@@ -52,6 +54,7 @@ class BarometerViewModel(
 
                 }
             }
+            .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
     }
 
