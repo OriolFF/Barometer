@@ -14,11 +14,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,8 +33,9 @@ fun BarometerScreen(
     val state by viewModel.state.collectAsState()
     val data = state.barometerData
     val isLoading = state.isLoading
+    val pressureHistory = state.pressureHistory
 
-    if (isLoading) {
+    if (isLoading && pressureHistory.isEmpty()) {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -45,24 +43,6 @@ fun BarometerScreen(
             CircularProgressIndicator()
         }
     } else {
-        // Keep a history of pressure readings for the chart
-        val pressureHistory = remember { mutableStateListOf<PressureReading>() }
-
-        // Add current reading to history
-        LaunchedEffect(data.pressureMilliBars) {
-            // Add new reading to history
-            val newReading = PressureReading(
-                timestamp = System.currentTimeMillis(),
-                pressure = data.pressureMilliBars
-            )
-
-            // Add to history, keeping only the last 20 readings
-            pressureHistory.add(newReading)
-            if (pressureHistory.size > 20) {
-                pressureHistory.removeAt(0)
-            }
-        }
-
         Column(
             modifier = modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -24,6 +24,6 @@ val appModule = module {
     factory { SubscribeBarometerUseCase(get()) }
 
     // Presentation
-    viewModel { BarometerViewModel(get(), get(), get()) }
+    viewModel { BarometerViewModel(get(), get(), get(), get()) }
 
 }

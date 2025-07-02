@@ -21,7 +21,7 @@ class HistoricViewModel(
     }
 
     private fun loadHistoricData() {
-        getAllPressureReadingsUseCase.execute()
+        getAllPressureReadingsUseCase.exec()
             .onEach { readings ->
                 _state.update {
                     it.copy(

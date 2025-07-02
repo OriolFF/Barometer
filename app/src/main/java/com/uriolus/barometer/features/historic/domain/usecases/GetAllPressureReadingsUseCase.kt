@@ -5,7 +5,7 @@ import com.uriolus.barometer.features.historic.domain.repository.HistoricReposit
 import kotlinx.coroutines.flow.Flow
 
 class GetAllPressureReadingsUseCase(private val repository: HistoricRepository) {
-    fun execute(): Flow<List<PressureSample>> {
+    fun exec(): Flow<List<PressureSample>> {
         return repository.getAll()
     }
 }
