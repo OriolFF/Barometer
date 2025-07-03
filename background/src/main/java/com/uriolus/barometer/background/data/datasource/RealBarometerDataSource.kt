@@ -1,11 +1,11 @@
-package com.uriolus.barometer.background.datasource
+package com.uriolus.barometer.background.data.datasource
 
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import com.uriolus.barometer.background.model.BarometerReading
+import com.uriolus.barometer.background.domain.model.BarometerReading
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
