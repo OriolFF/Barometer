@@ -39,14 +39,16 @@ fun BarometerScreen(
     val state by viewModel.state.collectAsState()
     BarometerScreen(
         modifier = modifier,
-        state = state
+        state = state,
+        onEvent = viewModel::onEvent
     )
 }
 
 @Composable
 private fun BarometerScreen(
     modifier: Modifier = Modifier,
-    state: BarometerViewState
+    state: BarometerViewState,
+    onEvent: (BarometerEvent) -> Unit
 ) {
 
     val data = state.barometerData
@@ -89,7 +91,8 @@ private fun BarometerScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         AnalogBarometerScreen(
                             data = data,
-                            modifier = Modifier.fillMaxWidth(0.6f)
+                            modifier = Modifier.fillMaxWidth(0.6f),
+                            onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) }
                         )
                     }
 
@@ -120,23 +123,21 @@ private fun BarometerScreen(
             else -> { // Portrait
                 Column(
                     modifier = modifier
-                        .padding(16.dp)
-                        .background(MaterialTheme.colorScheme.background),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     DigitalBarometerScreen(
                         data = data,
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        modifier = Modifier
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     AnalogBarometerScreen(
                         data = data,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) }
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Pressure chart section
+                    Spacer(modifier = Modifier.height(16.dp))
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -173,23 +174,27 @@ private fun BarometerScreen(
 fun BarometerScreenPreview() {
     BarometerScreen(
         state = BarometerViewState(
-            barometerData = BarometerData(1013.25f, 0.5f),
-            isLoading = false,
+            barometerData = BarometerData(
+                pressureMilliBars = 1013.25f,
+                tendencyMilliBars = 1015f
+            ),
             pressureHistory = listOf(
                 PressureReading(System.currentTimeMillis() - 10000, 1012f),
-                PressureReading(System.currentTimeMillis() - 5000, 1012.5f),
+                PressureReading(System.currentTimeMillis() - 5000, 1014f),
                 PressureReading(System.currentTimeMillis(), 1013.25f)
             )
-        )
+        ),
+        onEvent = {}
     )
 }
 
-@Preview(name = "Barometer Screen Loading")
+@Preview
 @Composable
 fun BarometerScreenLoadingPreview() {
     BarometerScreen(
         state = BarometerViewState(
             isLoading = true
-        )
+        ),
+        onEvent = {}
     )
 }

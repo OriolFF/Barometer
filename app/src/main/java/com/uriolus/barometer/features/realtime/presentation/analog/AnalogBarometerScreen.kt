@@ -5,10 +5,17 @@ import android.graphics.Typeface
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import com.uriolus.barometer.features.realtime.presentation.BarometerData
 import com.uriolus.barometer.features.realtime.util.PressureConverter
@@ -36,7 +44,8 @@ import kotlin.math.sin
 fun AnalogBarometerScreen(
     data: BarometerData,
     modifier: Modifier = Modifier,
-    config: AnalogBarometerConfig = AnalogBarometerConfig()
+    config: AnalogBarometerConfig = AnalogBarometerConfig(),
+    onEvent: () -> Unit
 ) {
     val clampedPressure = data.pressureMilliBars.coerceIn(
         config.millibarsRange.first.toFloat(),
@@ -52,6 +61,7 @@ fun AnalogBarometerScreen(
         animationSpec = tween(durationMillis = 1000),
         label = "pressureAnimation"
     )
+
     val animatedTendency by animateFloatAsState(
         targetValue = clampedTendency,
         animationSpec = tween(durationMillis = 1000),
@@ -59,7 +69,15 @@ fun AnalogBarometerScreen(
     )
 
     Box(
-        modifier = modifier.aspectRatio(1f),
+        modifier = modifier
+            .aspectRatio(1f)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        onEvent()
+                    }
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         BarometerDial(
@@ -328,6 +346,12 @@ private fun valueToAngle(value: Float, range: IntRange, startAngle: Float, sweep
 
 @Preview(showBackground = true)
 @Composable
-fun BarometerScreenPreview() {
-    AnalogBarometerScreen(BarometerData(1025f, 1030f))
+private fun BarometerScreenPreview() {
+    AnalogBarometerScreen(
+        data = BarometerData(
+            pressureMilliBars = 1013.25f,
+            tendencyMilliBars = 1015f
+        ),
+        onEvent = {}
+    )
 }

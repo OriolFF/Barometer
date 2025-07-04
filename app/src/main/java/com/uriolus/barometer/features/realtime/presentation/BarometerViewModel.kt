@@ -34,6 +34,20 @@ class BarometerViewModel(
         subscribeToBarometer()
     }
 
+    fun onEvent(event: BarometerEvent) {
+        when (event) {
+            is BarometerEvent.OnBarometerResetTendency -> {
+                _state.update {
+                    it.copy(
+                        barometerData = it.barometerData.copy(
+                            tendencyMilliBars = it.barometerData.pressureMilliBars
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     private fun loadHistoricData() {
         viewModelScope.launch {
             getAllPressureReadingsUseCase.exec().also {
