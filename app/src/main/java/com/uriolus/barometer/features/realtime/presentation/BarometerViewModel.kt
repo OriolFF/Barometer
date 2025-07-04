@@ -36,9 +36,10 @@ class BarometerViewModel(
 
     private fun loadHistoricData() {
         viewModelScope.launch {
-            getAllPressureReadingsUseCase.exec()
-                .flowOn(Dispatchers.IO)
-                .collect { samples ->
+            getAllPressureReadingsUseCase.exec().also {
+                Log.d("BarometerViewModel", "Historic data: $it")
+            }
+                .let { samples ->
                     val history = samples.map {
                         PressureReading(it.timestamp, it.pressureValue)
                     }
@@ -65,15 +66,10 @@ class BarometerViewModel(
                         pressureMilliBars = reading.pressure,
                         tendencyMilliBars = currentState.barometerData.pressureMilliBars
                     )
-                    val newHistoryReading = PressureReading(
-                        timestamp = System.currentTimeMillis(),
-                        pressure = reading.pressure
-                    )
-                    val updatedHistory = (currentState.pressureHistory + newHistoryReading).takeLast(100)
+
                     currentState.copy(
                         barometerData = newData,
-                        isLoading = false,
-                        pressureHistory = updatedHistory
+                        isLoading = false
                     )
                 }
             }

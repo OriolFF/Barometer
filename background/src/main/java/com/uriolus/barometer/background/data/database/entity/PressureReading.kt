@@ -1,4 +1,4 @@
-package com.uriolus.barometer.background.database.entity
+package com.uriolus.barometer.background.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

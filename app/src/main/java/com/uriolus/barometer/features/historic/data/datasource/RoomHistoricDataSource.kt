@@ -1,11 +1,10 @@
 package com.uriolus.barometer.features.historic.data.datasource
 
-import com.uriolus.barometer.background.database.dao.PressureDao
-import com.uriolus.barometer.background.database.entity.PressureReading
-import kotlinx.coroutines.flow.Flow
+import com.uriolus.barometer.background.data.database.dao.PressureDao
+import com.uriolus.barometer.background.data.database.entity.PressureReading
 
 class RoomHistoricDataSource(private val pressureDao: PressureDao) : HistoricDataSource {
-    override fun getAll(): Flow<List<PressureReading>> {
+    override suspend fun getAll(): List<PressureReading> {
         return pressureDao.getHistory()
     }
 }

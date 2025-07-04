@@ -1,15 +1,13 @@
 package com.uriolus.barometer.features.historic.data.datasource
 
-import com.uriolus.barometer.background.database.entity.PressureReading
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.uriolus.barometer.background.data.database.entity.PressureReading
 import kotlin.math.sin
 import kotlin.random.Random
 
 class MockHistoricDataSource : HistoricDataSource {
-    override fun getAll(): Flow<List<PressureReading>> {
+    override suspend fun getAll(): List<PressureReading> {
         val mockData = generateMockData()
-        return flowOf(mockData)
+        return mockData
     }
 
     private fun generateMockData(): List<PressureReading> {

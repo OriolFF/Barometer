@@ -3,7 +3,7 @@ package com.uriolus.barometer.features.realtime.presentation.analog
 import androidx.compose.ui.graphics.Color
 
 data class AnalogBarometerConfig(
-    val millibarsRange: IntRange = 940..1060,
+    val millibarsRange: IntRange = 900..1060,
     val millibarsStep: Int = 10,
     val arcDegrees: Float = 300f,
     val mainColor: Color = Color(0xFFD2B48C),

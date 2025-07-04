@@ -1,7 +1,6 @@
 package com.uriolus.barometer.features.historic.di
 
 import com.uriolus.barometer.features.historic.data.datasource.HistoricDataSource
-import com.uriolus.barometer.features.historic.data.datasource.MockHistoricDataSource
 import com.uriolus.barometer.features.historic.data.datasource.RoomHistoricDataSource
 import com.uriolus.barometer.features.historic.data.repository.HistoricRepositoryImpl
 import com.uriolus.barometer.features.historic.domain.repository.HistoricRepository
@@ -13,7 +12,7 @@ import org.koin.dsl.module
 val historicModule = module {
     // Data source
     single<HistoricDataSource> { RoomHistoricDataSource(get()) }
-    single<HistoricDataSource> { MockHistoricDataSource() }
+   // single<HistoricDataSource> { MockHistoricDataSource() }
 
     // Repository
     single<HistoricRepository> { HistoricRepositoryImpl(get()) }

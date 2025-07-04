@@ -1,4 +1,4 @@
-package com.uriolus.barometer.background.model
+package com.uriolus.barometer.background.domain.model
 
 data class BarometerReading(
     val pressure: Float,
