@@ -75,8 +75,8 @@ fun AnalogBarometerScreen(
             val startAngle = 270 - config.arcDegrees / 2
 
             // Needles
-            drawNeedle(animatedPressure, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false, config)
-            drawNeedle(animatedTendency, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true, config)
+            drawNeedle(animatedPressure, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false)
+            drawNeedle(animatedTendency, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true)
         }
     }
 }
@@ -148,8 +148,7 @@ private fun DrawScope.drawNeedle(
     centerY: Float,
     radius: Float,
     color: Color,
-    isTendencyNeedle: Boolean,
-    config: AnalogBarometerConfig
+    isTendencyNeedle: Boolean
 ) {
     val angle = valueToAngle(value, range, startAngle, sweepAngle)
     val angleRad = Math.toRadians(angle.toDouble())
@@ -164,7 +163,7 @@ private fun DrawScope.drawNeedle(
             color = color,
             start = Offset(centerX, centerY),
             end = end,
-            strokeWidth = 2f
+            strokeWidth = 4f
         )
     } else { // Main black needle
         val needleColor = Color.Black
@@ -186,7 +185,7 @@ private fun DrawScope.drawNeedle(
             color = needleColor,
             start = shaftStart,
             end = shaftEnd,
-            strokeWidth = 4f,
+            strokeWidth = 6f,
             cap = StrokeCap.Round
         )
 
