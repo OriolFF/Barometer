@@ -13,7 +13,7 @@ import org.koin.dsl.module
 val historicModule = module {
     // Data source
     single<HistoricDataSource> { RoomHistoricDataSource(get()) }
-    single<HistoricDataSource> { MockHistoricDataSource() }
+   // single<HistoricDataSource> { MockHistoricDataSource() }
 
     // Repository
     single<HistoricRepository> { HistoricRepositoryImpl(get()) }
