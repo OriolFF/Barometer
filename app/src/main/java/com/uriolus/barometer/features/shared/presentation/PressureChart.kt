@@ -4,7 +4,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -19,12 +22,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.min
+import kotlin.random.Random
 
 /**
  * A reusable chart component that displays pressure readings over time
@@ -37,7 +42,7 @@ fun PressureChart(readings: List<PressureReading>, modifier: Modifier = Modifier
     
     // Capture colors outside of the Canvas scope
     val primaryColor = MaterialTheme.colorScheme.primary
-    val gridLineColor = Color.Gray.copy(alpha = 0.3f)
+    val gridLineColor = Color.Gray.copy(alpha = 0.4f)
     
     // Calculate min and max pressure values with padding
     val minPressure = remember(readings) { readings.minOf { it.pressure } - 2f }
@@ -168,4 +173,33 @@ private fun formatTimestampToTime(timestamp: Long): String {
     val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
     val date = Date(timestamp)
     return sdf.format(date)
+}
+
+/**
+ * Preview of the PressureChart with mocked data
+ */
+@Preview(showBackground = true)
+@Composable
+fun PressureChartPreview() {
+    // Generate 40 mocked pressure readings between 940 and 1030
+    val mockedReadings = List(40) { index ->
+        val currentTime = System.currentTimeMillis()
+        // Each reading is 30 minutes apart
+        val timestamp = currentTime - (40 - index) * 30 * 60 * 1000L
+        
+        // Generate random pressure between 940 and 1030
+        val pressure = 940f + Random.nextFloat() * 90f
+        
+        PressureReading(timestamp, pressure)
+    }
+    
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .height(300.dp)
+        ) {
+            PressureChart(readings = mockedReadings)
+        }
+    }
 }
