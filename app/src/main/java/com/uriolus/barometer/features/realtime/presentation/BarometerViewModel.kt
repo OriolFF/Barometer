@@ -30,7 +30,7 @@ class BarometerViewModel(
 
     init {
         loadHistoricData()
-        start()
+        startBarometer()
         subscribeToBarometer()
     }
 
@@ -48,7 +48,7 @@ class BarometerViewModel(
         }
     }
 
-    private fun start() {
+    private fun startBarometer() {
         startBarometerUseCase()
     }
 
