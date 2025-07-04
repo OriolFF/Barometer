@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,6 +42,7 @@ fun AnalogBarometerScreen(
     data: BarometerData,
     modifier: Modifier = Modifier,
     config: AnalogBarometerConfig = AnalogBarometerConfig(),
+    isLoading: Boolean = false,
     onEvent: () -> Unit
 ) {
     val clampedPressure = data.pressureMilliBars.coerceIn(
@@ -80,17 +82,40 @@ fun AnalogBarometerScreen(
             modifier = Modifier.fillMaxSize(),
             config = config
         )
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val rimWidth = size.minDimension * 0.05f
+                val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
+                val centerX = size.width / 2f
+                val centerY = size.height / 2f
+                val startAngle = 270 - config.arcDegrees / 2
 
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val rimWidth = size.minDimension * 0.05f
-            val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
-            val centerX = size.width / 2f
-            val centerY = size.height / 2f
-            val startAngle = 270 - config.arcDegrees / 2
-
-            // Needles
-            drawNeedle(animatedPressure, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.mainNeedleColor, false)
-            drawNeedle(animatedTendency, config.millibarsRange, startAngle, config.arcDegrees, centerX, centerY, dialRadius, config.secondNeedleColor, true)
+                // Needles
+                drawNeedle(
+                    animatedPressure,
+                    config.millibarsRange,
+                    startAngle,
+                    config.arcDegrees,
+                    centerX,
+                    centerY,
+                    dialRadius,
+                    config.mainNeedleColor,
+                    false
+                )
+                drawNeedle(
+                    animatedTendency,
+                    config.millibarsRange,
+                    startAngle,
+                    config.arcDegrees,
+                    centerX,
+                    centerY,
+                    dialRadius,
+                    config.secondNeedleColor,
+                    true
+                )
+            }
         }
     }
 }
@@ -350,6 +375,20 @@ private fun BarometerScreenPreview() {
             pressureMilliBars = 1013.25f,
             tendencyMilliBars = 1015f
         ),
+        isLoading = false,
+        onEvent = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BarometerScreenLoadingPreview() {
+    AnalogBarometerScreen(
+        data = BarometerData(
+            pressureMilliBars = 1013.25f,
+            tendencyMilliBars = 1015f
+        ),
+        isLoading = true,
         onEvent = {}
     )
 }

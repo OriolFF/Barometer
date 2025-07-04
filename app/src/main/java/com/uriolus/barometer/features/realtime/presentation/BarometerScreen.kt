@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,107 +57,101 @@ private fun BarometerScreen(
     val pressureHistory = state.pressureHistory
     val configuration = LocalConfiguration.current
 
-    if (isLoading) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        when (configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> {
-                Row(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Top,
+    when (configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> {
+            Row(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Top,
 
-                    ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .padding(end = 8.dp)
-                            .background(MaterialTheme.colorScheme.background),
-
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        DigitalBarometerScreen(
-                            data = data,
-                            modifier = Modifier
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        AnalogBarometerScreen(
-                            data = data,
-                            modifier = Modifier.fillMaxWidth(0.6f),
-                            onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) }
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .padding(start = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = stringResource(id = R.string.pressure_trend),
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            PressureChart(
-                                readings = pressureHistory,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            else -> { // Portrait
+                ) {
                 Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(end = 8.dp)
+                        .background(MaterialTheme.colorScheme.background),
+
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
                 ) {
                     DigitalBarometerScreen(
                         data = data,
-                        modifier = Modifier
+                        modifier = Modifier,
+                        isLoading = isLoading
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     AnalogBarometerScreen(
                         data = data,
-                        modifier = Modifier.fillMaxWidth(0.95f),
-                        onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) }
+                        modifier = Modifier.fillMaxWidth(0.6f),
+                        onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) },
+                        isLoading = isLoading
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                           ,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = stringResource(id = R.string.pressure_trend),
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            PressureChart(
-                                readings = pressureHistory,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp)
-                            )
-                        }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(start = 8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(
+                            text = stringResource(id = R.string.pressure_trend),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        PressureChart(
+                            readings = pressureHistory,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        else -> { // Portrait
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DigitalBarometerScreen(
+                    data = data,
+                    modifier = Modifier,
+                    isLoading = isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                AnalogBarometerScreen(
+                    data = data,
+                    modifier = Modifier.fillMaxWidth(0.95f),
+                    onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) },
+                    isLoading = isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(
+                            text = stringResource(id = R.string.pressure_trend),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        PressureChart(
+                            readings = pressureHistory,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        )
                     }
                 }
             }
