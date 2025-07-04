@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.features.realtime.presentation.analog.AnalogBarometerScreen
 import com.uriolus.barometer.features.realtime.presentation.digital.DigitalBarometerScreen
 import com.uriolus.barometer.features.shared.presentation.PressureChart
-import com.uriolus.barometer.features.shared.presentation.PressureReading
 import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun BarometerScreen(
@@ -35,6 +35,18 @@ fun BarometerScreen(
     viewModel: BarometerViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    BarometerScreen(
+        modifier = modifier,
+        state = state
+    )
+}
+
+@Composable
+private fun BarometerScreen(
+    modifier: Modifier = Modifier,
+    state: BarometerViewState
+) {
+
     val data = state.barometerData
     val isLoading = state.isLoading
     val pressureHistory = state.pressureHistory
