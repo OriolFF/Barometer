@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class HistoricViewModel(
     private val getAllPressureReadingsUseCase: GetAllPressureReadingsUseCase
@@ -21,15 +22,16 @@ class HistoricViewModel(
     }
 
     private fun loadHistoricData() {
-        getAllPressureReadingsUseCase.exec()
-            .onEach { readings ->
-                _state.update {
-                    it.copy(
-                        readings = readings,
-                        isLoading = false
-                    )
+        viewModelScope.launch {
+            getAllPressureReadingsUseCase.exec()
+                .run {
+                    _state.update {
+                        it.copy(
+                            readings = this,
+                            isLoading = false
+                        )
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+        }
     }
 }

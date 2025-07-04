@@ -18,7 +18,7 @@ class RealPressureRepository(
         pressureDao.insert(pressureEntity)
     }
     
-    override fun getReadingHistory(): Flow<List<PressureReading>> {
+    override suspend fun getReadingHistory(): List<PressureReading> {
         return pressureDao.getHistory()
     }
 }

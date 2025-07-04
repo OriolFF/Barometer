@@ -75,7 +75,7 @@ fun BarometerScreen(
                         )
                         PressureChart(
                             readings = pressureHistory,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                         )
                     }
                 }

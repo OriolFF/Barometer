@@ -13,5 +13,5 @@ interface PressureDao {
     suspend fun insert(pressureReading: PressureReading)
 
     @Query("SELECT * FROM pressure_history ORDER BY timestamp DESC")
-    fun getHistory(): Flow<List<PressureReading>>
+    suspend fun getHistory(): List<PressureReading>
 }

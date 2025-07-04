@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface PressureRepository {
     suspend fun saveReading(reading: BarometerReading)
-    fun getReadingHistory(): Flow<List<PressureReading>>
+    suspend fun getReadingHistory(): List<PressureReading>
 }

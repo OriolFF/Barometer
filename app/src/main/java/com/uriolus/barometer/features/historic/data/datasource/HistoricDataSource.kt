@@ -4,5 +4,5 @@ import com.uriolus.barometer.background.data.database.entity.PressureReading
 import kotlinx.coroutines.flow.Flow
 
 interface HistoricDataSource {
-    fun getAll(): Flow<List<PressureReading>>
+    suspend fun getAll(): List<PressureReading>
 }
