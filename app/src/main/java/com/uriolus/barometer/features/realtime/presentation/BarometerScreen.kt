@@ -1,6 +1,7 @@
 package com.uriolus.barometer.features.realtime.presentation
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.uriolus.barometer.features.realtime.presentation.analog.AnalogBarometerScreen
 import com.uriolus.barometer.features.realtime.presentation.digital.DigitalBarometerScreen
 import com.uriolus.barometer.features.shared.presentation.PressureChart
+import com.uriolus.barometer.features.shared.presentation.PressureReading
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun BarometerScreen(
@@ -67,23 +69,27 @@ private fun BarometerScreen(
                         .fillMaxSize()
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    verticalAlignment = Alignment.Top,
+
+                    ) {
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(end = 8.dp),
+                            .fillMaxHeight()
+                            .padding(end = 8.dp)
+                            .background(MaterialTheme.colorScheme.background),
+
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Top
                     ) {
                         DigitalBarometerScreen(
                             data = data,
-                            modifier = Modifier.fillMaxWidth(0.8f)
+                            modifier = Modifier
                         )
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         AnalogBarometerScreen(
                             data = data,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(0.6f)
                         )
                     }
 
@@ -113,7 +119,9 @@ private fun BarometerScreen(
 
             else -> { // Portrait
                 Column(
-                    modifier = modifier.padding(16.dp),
+                    modifier = modifier
+                        .padding(16.dp)
+                        .background(MaterialTheme.colorScheme.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -153,4 +161,35 @@ private fun BarometerScreen(
             }
         }
     }
+}
+
+@Preview(name = "Barometer Screen Light theme")
+@Preview(name = "Barometer Screen Dark theme", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Barometer Screen Landscape",
+    device = "spec:width=411dp,height=891dp,dpi=420,orientation=landscape"
+)
+@Composable
+fun BarometerScreenPreview() {
+    BarometerScreen(
+        state = BarometerViewState(
+            barometerData = BarometerData(1013.25f, 0.5f),
+            isLoading = false,
+            pressureHistory = listOf(
+                PressureReading(System.currentTimeMillis() - 10000, 1012f),
+                PressureReading(System.currentTimeMillis() - 5000, 1012.5f),
+                PressureReading(System.currentTimeMillis(), 1013.25f)
+            )
+        )
+    )
+}
+
+@Preview(name = "Barometer Screen Loading")
+@Composable
+fun BarometerScreenLoadingPreview() {
+    BarometerScreen(
+        state = BarometerViewState(
+            isLoading = true
+        )
+    )
 }
