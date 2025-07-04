@@ -11,12 +11,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -31,7 +25,9 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.uriolus.barometer.R
 import com.uriolus.barometer.features.realtime.presentation.BarometerData
 import com.uriolus.barometer.features.realtime.util.PressureConverter
 import kotlin.math.ceil
@@ -104,6 +100,8 @@ private fun BarometerDial(
     modifier: Modifier = Modifier,
     config: AnalogBarometerConfig = AnalogBarometerConfig()
 ) {
+    val millibarsLabel = stringResource(id = R.string.analog_barometer_millibars)
+    val millimetresLabel = stringResource(id = R.string.analog_barometer_millimetres)
     Canvas(modifier = modifier) {
         val rimWidth = size.minDimension * 0.05f
         val dialRadius = (size.minDimension / 2f) - (rimWidth / 2f)
@@ -138,7 +136,7 @@ private fun BarometerDial(
 
         // Scales
         drawScale(centerX, centerY, dialRadius * 0.9f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = true)
-        drawScale(centerX, centerY, dialRadius * 0.7f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
+        drawScale(centerX, centerY, dialRadius * 0.65f, config.millibarsRange, config.millibarsStep, startAngle, config.arcDegrees, true, config, isMillibars = false)
 
         // Hub
         drawCircle(color = config.textColor, radius = dialRadius * 0.05f, center = Offset(centerX, centerY))
@@ -151,8 +149,8 @@ private fun BarometerDial(
             textAlign = Paint.Align.CENTER
         }
         drawIntoCanvas { canvas ->
-            canvas.nativeCanvas.drawText("MILLIBARS", centerX, centerY + dialRadius * 0.85f, textPaint)
-            canvas.nativeCanvas.drawText("MILLIMETRES", centerX, centerY + dialRadius * 0.65f, textPaint)
+            canvas.nativeCanvas.drawText(millibarsLabel, centerX, centerY + dialRadius * 0.85f, textPaint)
+            canvas.nativeCanvas.drawText(millimetresLabel, centerX, centerY + dialRadius * 0.65f, textPaint)
         }
     }
 }

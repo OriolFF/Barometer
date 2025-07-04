@@ -19,8 +19,8 @@ class SubscribeBarometerUseCase(private val repository: BarometerRepository) {
      */
     @OptIn(FlowPreview::class)
     fun exec(
-        pressureThreshold: Float = 0.01f,
-        timeThreshold: Duration = 500.milliseconds
+        pressureThreshold: Float = 0.05f,
+        timeThreshold: Duration = 5000.milliseconds
     ): Flow<BarometerReading> {
         var lastEmittedReading: BarometerReading? = null
         return repository.getBarometerReadings()

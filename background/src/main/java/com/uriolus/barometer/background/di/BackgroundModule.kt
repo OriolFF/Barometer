@@ -43,9 +43,7 @@ val backgroundModule = module {
     }
     
     // Register the WorkScheduler
-    single { 
-        WorkScheduler() 
-    }
+    single { WorkScheduler() }
     
     // Register the SavePressureWorker for dependency injection
     workerOf(::SavePressureWorker)

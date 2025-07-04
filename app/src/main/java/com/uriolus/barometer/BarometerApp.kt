@@ -18,9 +18,9 @@ class BarometerApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@BarometerApp)
-            modules(listOf(appModule, backgroundModule, historicModule))
             // Let Koin configure WorkManager
             workManagerFactory()
+            modules(listOf(appModule, backgroundModule, historicModule))
         }
 
         workScheduler.scheduleSensorWork(this)

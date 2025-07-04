@@ -23,8 +23,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uriolus.barometer.R
 import com.uriolus.barometer.features.realtime.presentation.analog.AnalogBarometerScreen
 import com.uriolus.barometer.features.realtime.presentation.digital.DigitalBarometerScreen
 import com.uriolus.barometer.features.shared.presentation.PressureChart
@@ -105,7 +107,7 @@ private fun BarometerScreen(
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(
-                                text = "Pressure Trend",
+                                text = stringResource(id = R.string.pressure_trend),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
@@ -134,19 +136,19 @@ private fun BarometerScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     AnalogBarometerScreen(
                         data = data,
-                        modifier = Modifier.fillMaxWidth(0.8f),
+                        modifier = Modifier.fillMaxWidth(0.95f),
                         onEvent = { onEvent(BarometerEvent.OnBarometerResetTendency) }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                           ,
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(
-                                text = "Pressure Trend",
+                                text = stringResource(id = R.string.pressure_trend),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
@@ -182,18 +184,8 @@ fun BarometerScreenPreview() {
                 PressureReading(System.currentTimeMillis() - 10000, 1012f),
                 PressureReading(System.currentTimeMillis() - 5000, 1014f),
                 PressureReading(System.currentTimeMillis(), 1013.25f)
-            )
-        ),
-        onEvent = {}
-    )
-}
-
-@Preview
-@Composable
-fun BarometerScreenLoadingPreview() {
-    BarometerScreen(
-        state = BarometerViewState(
-            isLoading = true
+            ),
+            isLoading = false
         ),
         onEvent = {}
     )
