@@ -73,6 +73,10 @@ fun PressureChart(
             val leftPadding = 50.dp
             val bottomPadding = 30.dp
 
+            val minTimestamp = remember(readings) { readings.minOf { it.timestamp } }
+            val maxTimestamp = remember(readings) { readings.maxOf { it.timestamp } }
+            val totalTimeRange = remember(minTimestamp, maxTimestamp) { (maxTimestamp - minTimestamp).toFloat() }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -136,15 +140,11 @@ fun PressureChart(
 
                     // Draw the pressure line
                     if (readings.size > 1) {
-                        val minTimestamp = remember(readings) { readings.minOf { it.timestamp } }
-                        val maxTimestamp = remember(readings) { readings.maxOf { it.timestamp } }
-                        val totalTimeRange = remember(minTimestamp, maxTimestamp) { (maxTimestamp - minTimestamp).toFloat() }
-
                         val path = Path()
 
                         readings.forEachIndexed { index, sample ->
                             val timeOffset = sample.timestamp - minTimestamp
-                            val x = leftPaddingPx + (timeOffset / totalTimeRange) * adjustedChartWidth
+                            val x = leftPaddingPx + ((timeOffset / totalTimeRange) * adjustedChartWidth * scale) + offset.x
                             val normalizedY = (sample.pressure - minPressure) / pressureRange
                             val y = adjustedChartHeight - (normalizedY * adjustedChartHeight)
 
@@ -175,7 +175,7 @@ fun PressureChart(
                             val index = (readings.size - 1) * i / (labelCount - 1)
                             val sample = readings[index]
                             val timeOffset = sample.timestamp - minTimestamp
-                            val x = leftPaddingPx + (timeOffset / totalTimeRange) * adjustedChartWidth
+                            val x = leftPaddingPx + ((timeOffset / totalTimeRange) * adjustedChartWidth * scale) + offset.x
 
                             drawText(
                                 textMeasurer = textMeasurer,
