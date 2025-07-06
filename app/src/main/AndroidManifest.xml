@@ -30,11 +30,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".background.service.PressureSensorService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
-
     </application>
 
 </manifest>

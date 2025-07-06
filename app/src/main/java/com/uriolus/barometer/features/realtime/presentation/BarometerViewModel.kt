@@ -33,9 +33,9 @@ class BarometerViewModel(
     val state: StateFlow<BarometerViewState> = _state.asStateFlow()
 
     init {
-        loadHistoricData()
         startBarometer()
         subscribeToBarometer()
+        loadHistoricData()
         subscribeToSecondNeedle()
     }
 

@@ -41,6 +41,7 @@ class PressureSensorService : Service(), KoinComponent {
                 barometerDataSource.start()
                 val reading = barometerDataSource.getBarometerReadings().first()
                 barometerDataSource.stop()
+                Log.d("PressureSensorService", "Pressure reading: $reading")
                 savePressureReadingUseCase(reading)
             } catch (e: Exception) {
                 Log.e("PressureSensorService", "Error getting pressure reading", e)

@@ -34,7 +34,7 @@ fun DigitalBarometerScreen(
         val text = if (isLoading) {
             stringResource(id = R.string.waiting_data)
         } else {
-            String.format(Locale.US, "%.2f", data.pressureMilliBars)
+            String.format(Locale.US, "%.2f hPa", data.pressureMilliBars)
         }
         Text(
             text = text,
