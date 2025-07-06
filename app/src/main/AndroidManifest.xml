@@ -3,6 +3,8 @@
     package="com.uriolus.barometer">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <uses-feature android:name="android.hardware.sensor.barometer" android:required="true" />
 
@@ -27,6 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".background.service.PressureSensorService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
 
     </application>
 

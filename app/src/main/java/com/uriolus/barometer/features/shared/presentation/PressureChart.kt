@@ -136,11 +136,15 @@ fun PressureChart(
 
                     // Draw the pressure line
                     if (readings.size > 1) {
+                        val minTimestamp = remember(readings) { readings.minOf { it.timestamp } }
+                        val maxTimestamp = remember(readings) { readings.maxOf { it.timestamp } }
+                        val totalTimeRange = remember(minTimestamp, maxTimestamp) { (maxTimestamp - minTimestamp).toFloat() }
+
                         val path = Path()
-                        val pointWidth = adjustedChartWidth / (readings.size - 1)
 
                         readings.forEachIndexed { index, sample ->
-                            val x = leftPaddingPx + (index * pointWidth * scale) + offset.x
+                            val timeOffset = sample.timestamp - minTimestamp
+                            val x = leftPaddingPx + (timeOffset / totalTimeRange) * adjustedChartWidth
                             val normalizedY = (sample.pressure - minPressure) / pressureRange
                             val y = adjustedChartHeight - (normalizedY * adjustedChartHeight)
 
@@ -170,7 +174,8 @@ fun PressureChart(
                         for (i in 0 until labelCount) {
                             val index = (readings.size - 1) * i / (labelCount - 1)
                             val sample = readings[index]
-                            val x = leftPaddingPx + (index * pointWidth * scale) + offset.x
+                            val timeOffset = sample.timestamp - minTimestamp
+                            val x = leftPaddingPx + (timeOffset / totalTimeRange) * adjustedChartWidth
 
                             drawText(
                                 textMeasurer = textMeasurer,

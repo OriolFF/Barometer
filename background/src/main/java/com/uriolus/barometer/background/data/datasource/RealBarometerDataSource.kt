@@ -31,7 +31,7 @@ class RealBarometerDataSource(context: Context) : BarometerDataSource {
 
     override fun start() {
         pressureSensor?.let {
-            sensorManager.registerListener(sensorEventListener, it, SensorManager.SENSOR_DELAY_UI)
+            sensorManager.registerListener(sensorEventListener, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
 
