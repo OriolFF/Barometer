@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.text.google.fonts)
 
+    //DataStore
+    implementation(libs.androidx.datastore.preferences)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uriolus.barometer.features.historic.domain.usecases.GetAllPressureReadingsUseCase
+import com.uriolus.barometer.features.realtime.domain.usecases.GetSecondNeedleValueUseCase
+import com.uriolus.barometer.features.realtime.domain.usecases.SetSecondNeedleValueUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.StartBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.StopBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.SubscribeBarometerUseCase
@@ -22,7 +24,9 @@ class BarometerViewModel(
     private val startBarometerUseCase: StartBarometerUseCase,
     private val stopBarometerUseCase: StopBarometerUseCase,
     private val subscribeBarometerUseCase: SubscribeBarometerUseCase,
-    private val getAllPressureReadingsUseCase: GetAllPressureReadingsUseCase
+    private val getAllPressureReadingsUseCase: GetAllPressureReadingsUseCase,
+    private val getSecondNeedleValueUseCase: GetSecondNeedleValueUseCase,
+    private val setSecondNeedleValueUseCase: SetSecondNeedleValueUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BarometerViewState())
@@ -32,17 +36,15 @@ class BarometerViewModel(
         loadHistoricData()
         startBarometer()
         subscribeToBarometer()
+        subscribeToSecondNeedle()
     }
 
     fun onEvent(event: BarometerEvent) {
         when (event) {
             is BarometerEvent.OnBarometerResetTendency -> {
-                _state.update {
-                    it.copy(
-                        barometerData = it.barometerData.copy(
-                            tendencyMilliBars = it.barometerData.pressureMilliBars
-                        )
-                    )
+                viewModelScope.launch {
+                    val currentPressure = _state.value.barometerData.pressureMilliBars
+                    setSecondNeedleValueUseCase.exec(currentPressure)
                 }
             }
         }
@@ -74,16 +76,27 @@ class BarometerViewModel(
         subscribeBarometerUseCase.exec()
             .onEach { reading ->
                 _state.update { currentState ->
-                    // For now, tendency is the previous pressure reading
-                    Log.d("BarometerViewModel", "New data: $reading")
-                    val newData = BarometerData(
-                        pressureMilliBars = reading.pressure,
-                        tendencyMilliBars = currentState.barometerData.pressureMilliBars
+                    val newData = currentState.barometerData.copy(
+                        pressureMilliBars = reading.pressure
                     )
-
                     currentState.copy(
                         barometerData = newData,
                         isLoading = false
+                    )
+                }
+            }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
+    }
+
+    private fun subscribeToSecondNeedle() {
+        getSecondNeedleValueUseCase.exec()
+            .onEach { value ->
+                _state.update {
+                    it.copy(
+                        barometerData = it.barometerData.copy(
+                            tendencyMilliBars = value ?: it.barometerData.pressureMilliBars
+                        )
                     )
                 }
             }
