@@ -32,7 +32,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.min
 
 @Composable
 fun HistoricScreen(

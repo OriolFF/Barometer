@@ -5,8 +5,8 @@ import com.uriolus.barometer.background.data.database.AppDatabase
 import com.uriolus.barometer.background.data.database.dao.PressureDao
 import com.uriolus.barometer.background.data.datasource.BarometerDataSource
 import com.uriolus.barometer.background.data.datasource.RealBarometerDataSource
-import com.uriolus.barometer.background.domain.PressureRepository
 import com.uriolus.barometer.background.data.repository.RealPressureRepository
+import com.uriolus.barometer.background.domain.PressureRepository
 import com.uriolus.barometer.background.domain.usecase.SavePressureReadingUseCase
 import com.uriolus.barometer.background.worker.SavePressureWorker
 import com.uriolus.barometer.background.worker.WorkScheduler

@@ -4,7 +4,6 @@ import com.uriolus.barometer.background.data.database.dao.PressureDao
 import com.uriolus.barometer.background.data.database.entity.PressureReading
 import com.uriolus.barometer.background.domain.PressureRepository
 import com.uriolus.barometer.background.domain.model.BarometerReading
-import kotlinx.coroutines.flow.Flow
 
 class RealPressureRepository(
     private val pressureDao: PressureDao

@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.uriolus.barometer.background.data.database.entity.PressureReading
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PressureDao {

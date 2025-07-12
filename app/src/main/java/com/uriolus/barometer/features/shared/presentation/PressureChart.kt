@@ -19,11 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +58,8 @@ fun PressureChart(
 
             // Capture colors outside of the Canvas scope
             val primaryColor = MaterialTheme.colorScheme.primary
-            val gridLineColor = Color.Gray.copy(alpha = 0.4f)
+            val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+            val gridLineColor = onSurfaceColor.copy(alpha = 0.2f)
 
             // Calculate min and max pressure values with padding
             val minPressure = remember(readings) { readings.minOf { it.pressure } - 2f }
@@ -134,7 +135,8 @@ fun PressureChart(
                         drawText(
                             textMeasurer = textMeasurer,
                             text = String.format("%.1f", pressure),
-                            topLeft = Offset(0f, y - 15.sp.toPx())
+                            topLeft = Offset(0f, y - 15.sp.toPx()),
+                            style = TextStyle(color = onSurfaceColor)
                         )
                     }
 
@@ -180,7 +182,8 @@ fun PressureChart(
                             drawText(
                                 textMeasurer = textMeasurer,
                                 text = formatTimestampToTime(sample.timestamp),
-                                topLeft = Offset(x - 20.sp.toPx(), chartHeight - 15.sp.toPx())
+                                topLeft = Offset(x - 20.sp.toPx(), chartHeight - 15.sp.toPx()),
+                                style = TextStyle(color = onSurfaceColor)
                             )
                         }
                     }
