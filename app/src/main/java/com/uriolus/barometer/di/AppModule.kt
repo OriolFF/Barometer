@@ -1,6 +1,7 @@
 package com.uriolus.barometer.di
 
 import com.uriolus.barometer.features.historic.domain.usecases.GetAllPressureReadingsUseCase
+import com.uriolus.barometer.features.historic.presentation.HistoricViewModel
 import com.uriolus.barometer.features.realtime.data.datasource.BarometerDataSource
 import com.uriolus.barometer.features.realtime.data.datasource.RealBarometerDataSource
 import com.uriolus.barometer.features.realtime.data.datasource.SecondNeedleDataSource
@@ -14,8 +15,10 @@ import com.uriolus.barometer.features.realtime.domain.usecases.StartBarometerUse
 import com.uriolus.barometer.features.realtime.domain.usecases.StopBarometerUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.SubscribeBarometerUseCase
 import com.uriolus.barometer.features.realtime.presentation.BarometerViewModel
+
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
+
 import org.koin.dsl.module
 
 val appModule = module {
@@ -24,7 +27,6 @@ val appModule = module {
     single<BarometerRepository> { BarometerRepositoryImpl(get()) }
     single { SecondNeedleDataSource(androidContext()) }
     single<SecondNeedleRepository> { SecondNeedleRepositoryImpl(get()) }
-
 
     // Domain
     factory { StartBarometerUseCase(get()) }
@@ -35,15 +37,6 @@ val appModule = module {
     factory { GetAllPressureReadingsUseCase(get()) }
 
     // Presentation
-    viewModel {
-        BarometerViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-
+    viewModelOf(::BarometerViewModel)
+    viewModelOf(::HistoricViewModel)
 }

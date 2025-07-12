@@ -6,7 +6,7 @@ import com.uriolus.barometer.features.historic.data.repository.HistoricRepositor
 import com.uriolus.barometer.features.historic.domain.repository.HistoricRepository
 import com.uriolus.barometer.features.historic.domain.usecases.GetAllPressureReadingsUseCase
 import com.uriolus.barometer.features.historic.presentation.HistoricViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 
 val historicModule = module {
@@ -21,5 +21,5 @@ val historicModule = module {
     factory { GetAllPressureReadingsUseCase(get()) }
 
     // ViewModel
-    viewModel { HistoricViewModel(get()) }
+    viewModelOf(::HistoricViewModel)
 }

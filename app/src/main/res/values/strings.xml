@@ -5,4 +5,5 @@
     <string name="analog_barometer_millimetres">MILLIMETRES</string>
     <string name="pressure_trend">Pressure Trend</string>
     <string name="waiting_data">Waiting data</string>
+    <string name="background_monitoring">Background Monitoring</string>
 </resources>

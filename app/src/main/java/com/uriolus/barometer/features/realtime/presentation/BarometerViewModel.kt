@@ -3,6 +3,7 @@ package com.uriolus.barometer.features.realtime.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.uriolus.barometer.background.worker.WorkScheduler
 import com.uriolus.barometer.features.historic.domain.usecases.GetAllPressureReadingsUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.GetSecondNeedleValueUseCase
 import com.uriolus.barometer.features.realtime.domain.usecases.SetSecondNeedleValueUseCase
@@ -26,7 +27,8 @@ class BarometerViewModel(
     private val subscribeBarometerUseCase: SubscribeBarometerUseCase,
     private val getAllPressureReadingsUseCase: GetAllPressureReadingsUseCase,
     private val getSecondNeedleValueUseCase: GetSecondNeedleValueUseCase,
-    private val setSecondNeedleValueUseCase: SetSecondNeedleValueUseCase
+    private val setSecondNeedleValueUseCase: SetSecondNeedleValueUseCase,
+    private val workScheduler: WorkScheduler
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BarometerViewState())
@@ -37,6 +39,7 @@ class BarometerViewModel(
         subscribeToBarometer()
         loadHistoricData()
         subscribeToSecondNeedle()
+        subscribeToBackgroundMonitoringState()
     }
 
     fun onEvent(event: BarometerEvent) {
@@ -47,6 +50,18 @@ class BarometerViewModel(
                     setSecondNeedleValueUseCase.exec(currentPressure)
                 }
             }
+
+            is BarometerEvent.OnToggleBackgroundMonitoring -> {
+                toggleBackgroundMonitoring(event.enabled)
+            }
+        }
+    }
+
+    private fun toggleBackgroundMonitoring(enabled: Boolean) {
+        if (enabled) {
+            workScheduler.scheduleSensorWork()
+        } else {
+            workScheduler.cancelSensorWork()
         }
     }
 
@@ -101,6 +116,14 @@ class BarometerViewModel(
                 }
             }
             .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
+    }
+
+    private fun subscribeToBackgroundMonitoringState() {
+        workScheduler.isSensorWorkScheduled()
+            .onEach { isRunning ->
+                _state.update { it.copy(isBackgroundMonitoringEnabled = isRunning) }
+            }
             .launchIn(viewModelScope)
     }
 

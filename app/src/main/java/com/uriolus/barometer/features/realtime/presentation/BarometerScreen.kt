@@ -3,7 +3,6 @@ package com.uriolus.barometer.features.realtime.presentation
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,6 +54,7 @@ private fun BarometerScreen(
     val data = state.barometerData
     val isLoading = state.isLoading
     val pressureHistory = state.pressureHistory
+    val isBackgroundMonitoringEnabled = state.isBackgroundMonitoringEnabled
     val configuration = LocalConfiguration.current
 
     when (configuration.orientation) {
@@ -80,7 +80,9 @@ private fun BarometerScreen(
                     DigitalBarometerScreen(
                         data = data,
                         modifier = Modifier,
-                        isLoading = isLoading
+                        isLoading = isLoading,
+                        isBackgroundMonitoringEnabled = isBackgroundMonitoringEnabled,
+                        onEvent = onEvent
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     AnalogBarometerScreen(
@@ -125,7 +127,9 @@ private fun BarometerScreen(
                 DigitalBarometerScreen(
                     data = data,
                     modifier = Modifier,
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    isBackgroundMonitoringEnabled = isBackgroundMonitoringEnabled,
+                    onEvent = onEvent
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 AnalogBarometerScreen(
@@ -178,7 +182,8 @@ fun BarometerScreenPreview() {
                 PressureReading(System.currentTimeMillis() - 5000, 1014f),
                 PressureReading(System.currentTimeMillis(), 1013.25f)
             ),
-            isLoading = false
+            isLoading = false,
+            isBackgroundMonitoringEnabled = true
         ),
         onEvent = {}
     )

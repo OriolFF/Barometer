@@ -41,10 +41,10 @@ val backgroundModule = module {
     single {
         SavePressureReadingUseCase(get())
     }
-    
+
     // Register the WorkScheduler
-    single { WorkScheduler() }
-    
+    single { WorkScheduler(androidContext()) }
+
     // Register the SavePressureWorker for dependency injection
     workerOf(::SavePressureWorker)
 }
